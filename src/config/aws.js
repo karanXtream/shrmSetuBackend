@@ -3,12 +3,29 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
+const CLOUDFRONT_DOMAIN = process.env.CLOUDFRONT_DOMAIN;
+
 // Configure AWS SDK
 const s3 = new AWS.S3({
   accessKeyId: process.env.AWS_ACCESS_KEY_ID,
   secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
   region: process.env.AWS_REGION,
 });
+
+/**
+ * Convert S3 URL to CloudFront URL for fast CDN access
+ * @param {string} s3Url - S3 URL
+ * @returns {string} - CloudFront URL or S3 URL if CloudFront not configured
+ */
+const getCloudFrontUrl = (s3Url) => {
+  if (!s3Url || !CLOUDFRONT_DOMAIN) return s3Url;
+  try {
+    const key = s3Url.split('.amazonaws.com/')[1];
+    return key ? `https://${CLOUDFRONT_DOMAIN}/${key}` : s3Url;
+  } catch (error) {
+    return s3Url;
+  }
+};
 
 /**
  * Upload file to S3
@@ -32,7 +49,8 @@ export const uploadToS3 = async (fileBuffer, fileName, mimeType) => {
 
   try {
     const result = await s3.upload(params).promise();
-    return result.Location; // Returns the S3 URL
+    // Return CloudFront URL for fast media delivery
+    return getCloudFrontUrl(result.Location) || result.Location;
   } catch (error) {
     throw new Error(`S3 upload failed: ${error.message}`);
   }
@@ -47,7 +65,8 @@ export const deleteFromS3 = async (fileUrl) => {
   if (!fileUrl) return false;
 
   try {
-    const key = fileUrl.split('.amazonaws.com/')[1];
+    // Handle both S3 and CloudFront URLs
+    let key = fileUrl.split('.amazonaws.com/')[1] || fileUrl.split(`${CLOUDFRONT_DOMAIN}/`)[1];
     await s3.deleteObject({
       Bucket: process.env.AWS_S3_BUCKET,
       Key: key,
@@ -58,5 +77,7 @@ export const deleteFromS3 = async (fileUrl) => {
     return false;
   }
 };
+
+export { getCloudFrontUrl };
 
 export default s3;

@@ -1,5 +1,5 @@
 import * as userService from '../services/user.service.js';
-import { uploadToS3 } from '../config/aws.js';
+import { uploadToS3, getCloudFrontUrl } from '../config/aws.js';
 import { validatePasswordStrength } from '../utils/auth.utils.js';
 import { validatePhoneNumber, validateEmail, validatePincode } from '../utils/validation.utils.js';
 
@@ -123,6 +123,13 @@ export const register = async (req, res) => {
         introductoryVideo: introVideoUrl,
       },
     });
+
+    // Return CloudFront URLs for fast media delivery
+    if (user && user.media) {
+      user.media.profilePhoto = user.media.profilePhoto ? getCloudFrontUrl(user.media.profilePhoto) : null;
+      user.media.shopPhotos = user.media.shopPhotos?.map(url => getCloudFrontUrl(url));
+      user.media.introductoryVideo = user.media.introductoryVideo ? getCloudFrontUrl(user.media.introductoryVideo) : null;
+    }
 
     res.status(201).json({
       success: true,
