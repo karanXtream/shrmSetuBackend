@@ -1,0 +1,581 @@
+{
+  "info": {
+    "_postman_id": "11223344-5566-7788-99aa-bbccddeeff00",
+    "name": "ShramSetu API - User & Worker",
+    "description": "Complete API testing collection for ShramSetu user and worker endpoints",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Register Worker",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fullName\": \"Rajesh Kumar\",\n  \"phoneNumber\": \"9876543210\",\n  \"email\": \"rajesh.kumar@example.com\",\n  \"password\": \"SecurePass123\",\n  \"role\": \"worker\",\n  \"city\": \"Delhi\",\n  \"state\": \"Delhi\",\n  \"pincode\": \"110001\",\n  \"addressLine1\": \"123 Main Street\",\n  \"addressLine2\": \"Apartment 4B\",\n  \"education\": \"12th_pass\",\n  \"yearsOfExperience\": \"5\",\n  \"skills\": \"Plumbing,Electrical,Carpentry\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/register",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "register"]
+            }
+          }
+        },
+        {
+          "name": "Register Client/User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fullName\": \"Priya Sharma\",\n  \"phoneNumber\": \"9987654321\",\n  \"email\": \"priya.sharma@example.com\",\n  \"password\": \"ClientPass123\",\n  \"role\": \"user\",\n  \"city\": \"Hyderabad\",\n  \"state\": \"Telangana\",\n  \"pincode\": \"500001\",\n  \"addressLine1\": \"Banjara Hills\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/register",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "register"]
+            }
+          }
+        },
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"identifier\": \"rajesh.kumar@example.com\",\n  \"password\": \"SecurePass123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "login"]
+            }
+          }
+        },
+        {
+          "name": "Verify Phone",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": \"{{user_id}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/verify-phone",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "verify-phone"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "User - Get",
+      "item": [
+        {
+          "name": "Get All Users",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/users?skip=0&limit=10",
+              "host": ["{{base_url}}"],
+              "path": ["api", "users"],
+              "query": [
+                {
+                  "key": "skip",
+                  "value": "0"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get User Profile",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/users/{{user_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "users", "{{user_id}}"]
+            }
+          }
+        },
+        {
+          "name": "Get Worker Users",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/users/workers/list?skip=0&limit=10",
+              "host": ["{{base_url}}"],
+              "path": ["api", "users", "workers", "list"],
+              "query": [
+                {
+                  "key": "skip",
+                  "value": "0"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get User Statistics",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/users/stats/count",
+              "host": ["{{base_url}}"],
+              "path": ["api", "users", "stats", "count"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "User - Update",
+      "item": [
+        {
+          "name": "Update User Profile",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fullName\": \"Rajesh Kumar Singh\",\n  \"email\": \"rajesh.singh@example.com\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/users/{{user_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "users", "{{user_id}}"]
+            }
+          }
+        },
+        {
+          "name": "Update User Location",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"city\": \"Mumbai\",\n  \"state\": \"Maharashtra\",\n  \"pincode\": \"400001\",\n  \"addressLine1\": \"456 Marine Drive\",\n  \"addressLine2\": \"Floor 10\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/users/{{user_id}}/location",
+              "host": ["{{base_url}}"],
+              "path": ["api", "users", "{{user_id}}", "location"]
+            }
+          }
+        },
+        {
+          "name": "Change Password",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"oldPassword\": \"SecurePass123\",\n  \"newPassword\": \"NewSecurePass456\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/users/{{user_id}}/password",
+              "host": ["{{base_url}}"],
+              "path": ["api", "users", "{{user_id}}", "password"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "User - Delete",
+      "item": [
+        {
+          "name": "Delete User Account",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/users/{{user_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "users", "{{user_id}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Worker - Create & Get",
+      "item": [
+        {
+          "name": "Create Worker Profile",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": \"{{user_id}}\",\n  \"experienceYears\": 5,\n  \"skills\": [\"Plumbing\", \"Electrical\", \"Carpentry\"],\n  \"education\": \"12th_pass\",\n  \"bio\": \"Experienced plumber with 5+ years in residential and commercial work\",\n  \"hourlyRate\": 500\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/workers",
+              "host": ["{{base_url}}"],
+              "path": ["api", "workers"]
+            }
+          }
+        },
+        {
+          "name": "Get All Workers",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/workers?skip=0&limit=10",
+              "host": ["{{base_url}}"],
+              "path": ["api", "workers"],
+              "query": [
+                {
+                  "key": "skip",
+                  "value": "0"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Worker Profile",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/workers/{{user_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "workers", "{{user_id}}"]
+            }
+          }
+        },
+        {
+          "name": "Get Worker Statistics",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/workers/{{user_id}}/stats",
+              "host": ["{{base_url}}"],
+              "path": ["api", "workers", "{{user_id}}", "stats"]
+            }
+          }
+        },
+        {
+          "name": "Get Top-Rated Workers",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/workers/top?limit=5",
+              "host": ["{{base_url}}"],
+              "path": ["api", "workers", "top"],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "5"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Search Workers by Skill",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/workers/search/Plumbing?skip=0&limit=10",
+              "host": ["{{base_url}}"],
+              "path": ["api", "workers", "search", "Plumbing"],
+              "query": [
+                {
+                  "key": "skip",
+                  "value": "0"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Worker - Update",
+      "item": [
+        {
+          "name": "Update Worker Profile",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"experienceYears\": 6,\n  \"skills\": [\"Plumbing\", \"Electrical\", \"Carpentry\", \"Painting\"],\n  \"bio\": \"Expert plumber with 6+ years of experience\",\n  \"hourlyRate\": 600,\n  \"isAvailable\": true\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/workers/{{user_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "workers", "{{user_id}}"]
+            }
+          }
+        },
+        {
+          "name": "Toggle Worker Availability",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"isAvailable\": false\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/workers/{{user_id}}/availability",
+              "host": ["{{base_url}}"],
+              "path": ["api", "workers", "{{user_id}}", "availability"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Worker - Media",
+      "item": [
+        {
+          "name": "Upload Profile Photo",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"photoUrl\": \"https://cdn.shrmsetu.com/photos/rajesh-profile.jpg\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/workers/{{user_id}}/photo",
+              "host": ["{{base_url}}"],
+              "path": ["api", "workers", "{{user_id}}", "photo"]
+            }
+          }
+        },
+        {
+          "name": "Add Shop Photo",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"photoUrl\": \"https://cdn.shrmsetu.com/shops/rajesh-shop-1.jpg\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/workers/{{user_id}}/shop-photo",
+              "host": ["{{base_url}}"],
+              "path": ["api", "workers", "{{user_id}}", "shop-photo"]
+            }
+          }
+        },
+        {
+          "name": "Remove Shop Photo",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"photoUrl\": \"https://cdn.shrmsetu.com/shops/rajesh-shop-1.jpg\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/workers/{{user_id}}/shop-photo",
+              "host": ["{{base_url}}"],
+              "path": ["api", "workers", "{{user_id}}", "shop-photo"]
+            }
+          }
+        },
+        {
+          "name": "Upload Introductory Video",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"videoUrl\": \"https://video.shrmsetu.com/workers/rajesh-intro.mp4\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/workers/{{user_id}}/video",
+              "host": ["{{base_url}}"],
+              "path": ["api", "workers", "{{user_id}}", "video"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Worker - Skills",
+      "item": [
+        {
+          "name": "Add Skill",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"skill\": \"Painting\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/workers/{{user_id}}/skill",
+              "host": ["{{base_url}}"],
+              "path": ["api", "workers", "{{user_id}}", "skill"]
+            }
+          }
+        },
+        {
+          "name": "Remove Skill",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"skill\": \"Carpentry\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/workers/{{user_id}}/skill",
+              "host": ["{{base_url}}"],
+              "path": ["api", "workers", "{{user_id}}", "skill"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Worker - Delete",
+      "item": [
+        {
+          "name": "Delete Worker Profile (Cascading)",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/workers/{{user_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "workers", "{{user_id}}"]
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://10.109.45.16:5000",
+      "type": "string"
+    },
+    {
+      "key": "user_id",
+      "value": "507f1f77bcf86cd799439011",
+      "type": "string"
+    }
+  ]
+}

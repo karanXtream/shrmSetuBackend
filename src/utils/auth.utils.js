@@ -10,8 +10,8 @@ import bcrypt from 'bcryptjs';
  * @returns {Promise<string>} - Hashed password
  */
 export const hashPassword = async (password) => {
-  if (!password || password.length < 8) {
-    throw new Error('Password must be at least 8 characters long');
+  if (!password) {
+    throw new Error('Password is required');
   }
   const salt = await bcrypt.genSalt(10);
   return await bcrypt.hash(password, salt);
@@ -35,20 +35,8 @@ export const comparePassword = async (plainPassword, hashedPassword) => {
 export const validatePasswordStrength = (password) => {
   const errors = [];
 
-  if (!password || password.length < 8) {
-    errors.push('Password must be at least 8 characters');
-  }
-  if (!/[A-Z]/.test(password)) {
-    errors.push('Password must contain uppercase letter');
-  }
-  if (!/[a-z]/.test(password)) {
-    errors.push('Password must contain lowercase letter');
-  }
-  if (!/[0-9]/.test(password)) {
-    errors.push('Password must contain number');
-  }
-  if (!/[!@#$%^&*]/.test(password)) {
-    errors.push('Password must contain special character (!@#$%^&*)');
+  if (!password) {
+    errors.push('Password is required');
   }
 
   return {

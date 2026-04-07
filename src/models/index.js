@@ -5,5 +5,6 @@ import Location from './Location.js';
 import Skill from './Skill.js';
 import WorkerSkill from './WorkerSkill.js';
 import Media from './Media.js';
+import Post from './Post.js';
 
-export { User, Worker, Location, Skill, WorkerSkill, Media };
+export { User, Worker, Location, Skill, WorkerSkill, Media, Post };

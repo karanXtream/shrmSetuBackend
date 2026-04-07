@@ -29,6 +29,7 @@ export const createWorkerProfile = async (userId, profileData) => {
     userId,
     experienceYears: profileData.experienceYears || 0,
     skills: profileData.skills || [],
+    education: profileData.education || '',
     bio: profileData.bio,
     hourlyRate: profileData.hourlyRate,
     isAvailable: true,
@@ -77,6 +78,7 @@ export const updateWorkerProfile = async (userId, updateData) => {
   const allowedFields = [
     'experienceYears',
     'skills',
+    'education',
     'bio',
     'hourlyRate',
     'isAvailable',
@@ -173,23 +175,6 @@ export const uploadIntroVideo = async (userId, videoUrl) => {
 };
 
 /**
- * Upload certificate
- * @param {string} userId - User ObjectId
- * @param {string} certificateUrl - Certificate file URL
- * @returns {object} - Updated worker profile
- */
-export const uploadCertificate = async (userId, certificateUrl) => {
-  return await Worker.findOneAndUpdate(
-    { userId },
-    {
-      'certificate.fileUrl': certificateUrl,
-      'certificate.verifiedAt': null,
-    },
-    { new: true }
-  );
-};
-
-/**
  * Add skill to worker
  * @param {string} userId - User ObjectId
  * @param {string} skill - Skill name
@@ -275,7 +260,7 @@ export const getWorkersBySkill = async (skill, skip = 0, limit = 10) => {
  * @returns {array} - Top workers
  */
 export const getTopWorkers = async (limit = 5) => {
-  return await Worker.find({ isVerified: true, isAvailable: true })
+  return await Worker.find({ isAvailable: true })
     .limit(limit)
     .populate({
       path: 'userId',
@@ -284,23 +269,7 @@ export const getTopWorkers = async (limit = 5) => {
     .sort({ 'rating.averageRating': -1 });
 };
 
-/**
- * Set worker verification and certificate
- * @param {string} userId - User ObjectId
- * @param {string} verifiedBy - Admin user ID
- * @returns {object} - Updated worker profile
- */
-export const setWorkerVerified = async (userId, verifiedBy) => {
-  return await Worker.findOneAndUpdate(
-    { userId },
-    {
-      isVerified: true,
-      'certificate.verifiedAt': new Date(),
-      'certificate.verifiedBy': verifiedBy,
-    },
-    { new: true }
-  );
-};
+
 
 /**
  * Update rating
@@ -347,12 +316,40 @@ export const getWorkerStats = async (userId) => {
     experienceYears: worker.experienceYears,
     skillsCount: worker.skills.length,
     isAvailable: worker.isAvailable,
-    isVerified: worker.isVerified,
     rating: worker.rating,
     mediaCount: {
       profilePhoto: !!worker.media.profilePhoto ? 1 : 0,
       shopPhotos: worker.media.shopPhotos.length,
       introductoryVideo: !!worker.media.introductoryVideo ? 1 : 0,
     },
+  };
+};
+
+/**
+ * Delete worker profile and associated user account (cascading delete)
+ * @param {string} userId - User ObjectId
+ * @returns {object} - Deletion confirmation
+ */
+export const deleteWorkerProfile = async (userId) => {
+  // Find worker profile first
+  const worker = await Worker.findOne({ userId });
+  if (!worker) {
+    throw new Error('Worker profile not found');
+  }
+
+  // Delete worker profile
+  await Worker.findOneAndDelete({ userId });
+
+  // Delete associated user account (cascading delete)
+  const deletedUser = await User.findByIdAndDelete(userId);
+
+  if (!deletedUser) {
+    throw new Error('User account could not be deleted');
+  }
+
+  return {
+    message: 'Worker profile and associated user account deleted successfully',
+    workerId: worker._id,
+    userId: deletedUser._id,
   };
 };

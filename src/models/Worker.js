@@ -53,14 +53,11 @@ const workerProfileSchema = new mongoose.Schema(
       },
     },
 
-    // Certificate (Embedded Object)
-    certificate: {
-      fileUrl: {
-        type: String, // URL only
-        default: null,
-      },
-      verifiedAt: Date,
-      verifiedBy: mongoose.Schema.Types.ObjectId, // Admin user ID
+    // Education Qualification
+    education: {
+      type: String,
+      enum: ['', 'graduate_above', 'diploma_iti', '12th_pass', '10th_pass', '5th_pass', 'no_education'],
+      default: '',
     },
 
     // Professional Info
@@ -87,12 +84,6 @@ const workerProfileSchema = new mongoose.Schema(
       },
     },
 
-    // Verification Status
-    isVerified: {
-      type: Boolean,
-      default: false,
-    },
-
     // Timestamps
     createdAt: {
       type: Date,
@@ -114,7 +105,6 @@ const workerProfileSchema = new mongoose.Schema(
 workerProfileSchema.index({ userId: 1 });
 workerProfileSchema.index({ isAvailable: 1 });
 workerProfileSchema.index({ skills: 1 });
-workerProfileSchema.index({ isVerified: 1 });
 workerProfileSchema.index({ rating: -1 });
 
 /**

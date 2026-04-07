@@ -69,6 +69,12 @@ router.patch('/:userId/media', workerController.updateMedia);
 router.patch('/:userId/availability', workerController.toggleAvailability);
 
 /**
+ * DELETE /api/workers/:userId
+ * Delete worker profile and associated user account (cascading delete)
+ */
+router.delete('/:userId', workerController.deleteProfile);
+
+/**
  * POST /api/workers/:userId/photo
  * Upload profile photo
  * Body: { photoUrl }

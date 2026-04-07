@@ -1,5 +1,4 @@
 import * as userService from '../services/user.service.js';
-import { validatePasswordStrength } from '../utils/auth.utils.js';
 import { validatePhoneNumber, validateEmail } from '../utils/validation.utils.js';
 
 /**
@@ -145,16 +144,6 @@ export const changePassword = async (req, res) => {
       return res.status(400).json({
         success: false,
         message: 'Old password and new password are required',
-      });
-    }
-
-    // Validate new password strength
-    const passwordValidation = validatePasswordStrength(newPassword);
-    if (!passwordValidation.isValid) {
-      return res.status(400).json({
-        success: false,
-        message: 'New password is not strong enough',
-        errors: passwordValidation.errors,
       });
     }
 

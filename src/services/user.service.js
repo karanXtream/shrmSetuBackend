@@ -1,5 +1,5 @@
 import User from '../models/User.js';
-import { hashPassword, comparePassword } from '../utils/auth.utils.js';
+import { comparePassword } from '../utils/auth.utils.js';
 import { validateEmail, validatePhoneNumber } from '../utils/validation.utils.js';
 
 /**
@@ -34,7 +34,17 @@ const enhanceUserWithWorkerData = async (user) => {
  * @returns {object} - Created user without passwordHash
  */
 export const registerUser = async (userData) => {
-  const { fullName, phoneNumber, email, password, role = 'user', location, media } = userData;
+  const { fullName, phoneNumber, email, password, role = 'user', location, media, workerData } = userData;
+  const normalizedEmail = email ? email.trim().toLowerCase() : '';
+  const normalizedSkills = Array.isArray(workerData?.skills)
+    ? workerData.skills
+    : typeof workerData?.skills === 'string' && workerData.skills.trim()
+      ? workerData.skills.split(',').map((skill) => skill.trim()).filter(Boolean)
+      : [];
+  const normalizedExperienceYears = Number(workerData?.experienceYears);
+  const safeExperienceYears = Number.isFinite(normalizedExperienceYears)
+    ? normalizedExperienceYears
+    : 0;
 
   // Validate inputs
   if (!fullName || !phoneNumber || !password) {
@@ -45,41 +55,50 @@ export const registerUser = async (userData) => {
     throw new Error('Invalid phone number format (must be 10 digits)');
   }
 
-  if (email && !validateEmail(email)) {
+  if (normalizedEmail && !validateEmail(normalizedEmail)) {
     throw new Error('Invalid email format');
   }
 
-  // Check if user already exists
-  const existingUser = await User.findOne({
-    $or: [{ phoneNumber }, { email }],
-  });
+  // Check duplicates separately so the error matches the real conflict
+  const [existingPhoneUser, existingEmailUser] = await Promise.all([
+    User.findOne({ phoneNumber }),
+    normalizedEmail ? User.findOne({ email: normalizedEmail }) : Promise.resolve(null),
+  ]);
 
-  if (existingUser) {
-    throw new Error('User with this phone number or email already exists');
+  if (existingPhoneUser && existingEmailUser) {
+    throw new Error('User with this phone number and email already exists');
   }
 
-  // Hash password
-  const passwordHash = await hashPassword(password);
+  if (existingPhoneUser) {
+    throw new Error('User with this phone number already exists');
+  }
+
+  if (existingEmailUser) {
+    throw new Error('User with this email already exists');
+  }
 
   // Create user with location
   const user = await User.create({
     fullName,
     phoneNumber,
-    email,
-    passwordHash,
+    email: normalizedEmail || undefined,
+    passwordHash: password,
     role,
     location: location || {},
   });
 
-  // If user is worker, create worker profile with media
-  if (role === 'worker' && media) {
-    const { default: WorkerProfile } = await import('../../models/Worker.js');
+  // If user is worker, create worker profile with worker details and media
+  if (role === 'worker') {
+    const { default: WorkerProfile } = await import('../models/Worker.js');
     await WorkerProfile.create({
       userId: user._id,
+      experienceYears: safeExperienceYears,
+      skills: normalizedSkills,
+      education: workerData?.education || '',
       media: {
-        profilePhoto: media.profilePhoto,
-        shopPhotos: media.shopPhotos || [],
-        introductoryVideo: media.introductoryVideo,
+        profilePhoto: media?.profilePhoto || null,
+        shopPhotos: media?.shopPhotos || [],
+        introductoryVideo: media?.introductoryVideo || null,
       },
     });
   }
@@ -208,8 +227,8 @@ export const updatePassword = async (userId, oldPassword, newPassword) => {
     throw new Error('Current password is incorrect');
   }
 
-  // Hash new password
-  user.passwordHash = await hashPassword(newPassword);
+  // Set plain new password; User model pre-save hook will hash it once.
+  user.passwordHash = newPassword;
   await user.save();
 
   return user.toSafeJSON();

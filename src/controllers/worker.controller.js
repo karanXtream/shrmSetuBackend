@@ -11,7 +11,7 @@ import * as workerService from '../services/worker.service.js';
 export const createProfile = async (req, res) => {
   try {
     const { userId } = req.body;
-    const { experienceYears, skills, bio, hourlyRate } = req.body;
+    const { experienceYears, skills, bio, hourlyRate, education } = req.body;
 
     if (!userId) {
       return res.status(400).json({
@@ -21,10 +21,15 @@ export const createProfile = async (req, res) => {
     }
 
     const profileData = {
-      experienceYears,
-      skills: skills || [],
+      experienceYears: Number(experienceYears) || 0,
+      skills: Array.isArray(skills)
+        ? skills
+        : typeof skills === 'string' && skills.trim()
+          ? skills.split(',').map((skill) => skill.trim()).filter(Boolean)
+          : [],
       bio,
       hourlyRate,
+      education: education || '',
     };
 
     const profile = await workerService.createWorkerProfile(userId, profileData);
@@ -85,7 +90,7 @@ export const getProfile = async (req, res) => {
 export const updateProfile = async (req, res) => {
   try {
     const { userId } = req.params;
-    const { experienceYears, skills, bio, hourlyRate, isAvailable } = req.body;
+    const { experienceYears, skills, bio, hourlyRate, isAvailable, education } = req.body;
 
     if (!userId) {
       return res.status(400).json({
@@ -95,11 +100,18 @@ export const updateProfile = async (req, res) => {
     }
 
     const updateData = {};
-    if (experienceYears !== undefined) updateData.experienceYears = experienceYears;
-    if (skills) updateData.skills = skills;
+    if (experienceYears !== undefined) updateData.experienceYears = Number(experienceYears) || 0;
+    if (skills) {
+      updateData.skills = Array.isArray(skills)
+        ? skills
+        : typeof skills === 'string' && skills.trim()
+          ? skills.split(',').map((skill) => skill.trim()).filter(Boolean)
+          : [];
+    }
     if (bio) updateData.bio = bio;
     if (hourlyRate !== undefined) updateData.hourlyRate = hourlyRate;
     if (isAvailable !== undefined) updateData.isAvailable = isAvailable;
+    if (education) updateData.education = education;
 
     const profile = await workerService.updateWorkerProfile(userId, updateData);
 
@@ -368,6 +380,36 @@ export const toggleAvailability = async (req, res) => {
       success: true,
       message: 'Availability updated',
       data: profile,
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+/**
+ * DELETE /api/workers/:userId
+ * Delete worker profile and associated user account (cascading delete)
+ */
+export const deleteProfile = async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    if (!userId) {
+      return res.status(400).json({
+        success: false,
+        message: 'User ID is required',
+      });
+    }
+
+    const result = await workerService.deleteWorkerProfile(userId);
+
+    res.status(200).json({
+      success: true,
+      message: result.message,
+      data: result,
     });
   } catch (error) {
     res.status(400).json({

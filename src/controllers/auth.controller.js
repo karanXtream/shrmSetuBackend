@@ -1,6 +1,5 @@
 import * as userService from '../services/user.service.js';
 import { uploadToS3, getCloudFrontUrl } from '../config/aws.js';
-import { validatePasswordStrength } from '../utils/auth.utils.js';
 import { validatePhoneNumber, validateEmail, validatePincode } from '../utils/validation.utils.js';
 
 /**
@@ -13,7 +12,8 @@ import { validatePhoneNumber, validateEmail, validatePincode } from '../utils/va
  */
 export const register = async (req, res) => {
   try {
-    const { fullName, phoneNumber, email, password, role, city, state, pincode, addressLine1, addressLine2 } = req.body;
+    const { fullName, phoneNumber, email, password, role, city, state, pincode, addressLine1, addressLine2, skills, education, yearsOfExperience } = req.body;
+    const normalizedRole = role === 'work' ? 'worker' : role === 'hire' ? 'user' : role;
 
     // Validate required fields
     if (!fullName || !phoneNumber || !email || !password || !city || !state || !pincode || !addressLine1) {
@@ -44,16 +44,6 @@ export const register = async (req, res) => {
       return res.status(400).json({
         success: false,
         message: 'Invalid pincode (must be 6 digits)',
-      });
-    }
-
-    // Validate password strength
-    const passwordValidation = validatePasswordStrength(password);
-    if (!passwordValidation.isValid) {
-      return res.status(400).json({
-        success: false,
-        message: 'Password is not strong enough',
-        errors: passwordValidation.errors,
       });
     }
 
@@ -109,7 +99,7 @@ export const register = async (req, res) => {
       phoneNumber,
       email,
       password,
-      role: role || 'user',
+      role: normalizedRole || 'user',
       location: {
         city,
         state,
@@ -122,6 +112,12 @@ export const register = async (req, res) => {
         shopPhotos: shopPhotosUrls,
         introductoryVideo: introVideoUrl,
       },
+      // Worker-specific fields
+      workerData: normalizedRole === 'worker' ? {
+        education: education || '',
+        experienceYears: yearsOfExperience || 0,
+        skills: skills || [],
+      } : null,
     });
 
     // Return CloudFront URLs for fast media delivery
