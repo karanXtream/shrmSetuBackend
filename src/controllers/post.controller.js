@@ -410,17 +410,17 @@ export const applyForPost = async (req, res) => {
       });
     }
 
-    // Check if already applied
-    const alreadyApplied = post.applicants.some(
-      (app) => app.workerId.toString() === workerId
-    );
-
-    if (alreadyApplied) {
-      return res.status(400).json({
-        success: false,
-        message: 'You have already applied for this post',
-      });
-    }
+    // REMOVED: Check if already applied (for testing purposes)
+    // Commented out to allow multiple applications for testing
+    // const alreadyApplied = post.applicants.some(
+    //   (app) => app.workerId.toString() === workerId
+    // );
+    // if (alreadyApplied) {
+    //   return res.status(400).json({
+    //     success: false,
+    //     message: 'You have already applied for this post',
+    //   });
+    // }
 
     // Add applicant
     post.applicants.push({
